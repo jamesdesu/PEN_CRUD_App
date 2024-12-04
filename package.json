@@ -1,11 +1,15 @@
 {
   "name": "pen",
   "version": "1.0.0",
-  "description": "A backend for a CRUD app using Postgres, Express, and Node.",
+  "description": "A backend for a CRUD app using Postgres, Express, and Node. It interfaces with a Postgres database with a table containing a video game collection",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.1",
+    "pg": "^8.13.1"
+  }
 }
