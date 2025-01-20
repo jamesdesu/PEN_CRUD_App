@@ -66,14 +66,14 @@ router.post('/updateGame/:id', (req, res) => {
             throw error;
         }
         //Return a message stating that the update went through.
-        res.status(200).send(`User with ID of '${id}' modified successfully.`)
+        res.status(200).send(`Game with ID of '${id}' modified successfully.`)
     });
 });
 
 
 //DELETE.
 
-//APIE route for deleting based on ID.
+//API route for deleting based on ID.
 router.post('/deleteGame/:id', (req, res) => {
     //ID is pulled from the request params.
     const id = parseInt(req.params.id);
@@ -83,7 +83,7 @@ router.post('/deleteGame/:id', (req, res) => {
             throw error;
         }
         //Return a message that the update went through.
-        res.status(200).send("Game with ID of '${id}' deleted successfully.");
+        res.status(200).send(`Game with ID of '${id}' deleted successfully.`);
     })
 });
 
