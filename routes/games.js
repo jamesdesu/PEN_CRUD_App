@@ -42,12 +42,36 @@ router.get('/allGames', (req, res) => {
 //API route for returning based on search.
 router.get('/searchGames', (req, res) => {
     //ID is pulled from the request params.
-    const title = req.params.title;
-    const releaseYear = parseInt(req.params.releaseYear);
-    const publisher = req.params.publisher;
-    const system = req.params.system;
+    const title = req.query.title;
+    const releaseYear = parseInt(req.query.releaseYear);
+    const publisher = req.query.publisher;
+    const system = req.query.system;
+    let paramCount = 1;
     //Query is sent.
-    pool.query('SELECT * FROM games WHERE ' + title? 'title=$1' : '1=1' + 'AND' + releaseYear? 'releaseYear=$2' : '1=1' + 'AND' + publisher? 'publisher=$3' : '1=1' + 'AND' + system? 'system=$1' : '1=1', [title, releaseYear, publisher, system], (error, results) => {
+    let query = 
+        "SELECT * FROM games WHERE 1=1 AND " + (
+            title ?
+                "title=$" + paramCount++ + ((publisher || system || releaseYear) ?
+                    " AND " : "")
+                : ""
+        )
+        + (
+            publisher ?
+                "publisher=$" + paramCount++ + ((system || releaseYear) ?
+                    " AND " : "")
+                : ""
+        )
+        + (
+            system ?
+                "system=$" + paramCount++ + ((releaseYear) ?
+                    " AND " : "")
+                : ""
+        )
+        + (
+            releaseYear ? ("release_year=$" + paramCount) : ""
+        );
+    let args = [title ? title : false, publisher ? publisher : false, system ? system : false, releaseYear ? releaseYear : false].filter(Boolean);
+    pool.query(query, args, (error, results) => {
         if (error) {
             throw error;
         }
@@ -64,32 +88,34 @@ router.post('/updateGame/:id', (req, res) => {
     const id = parseInt(req.params.id);
     const {title, publisher, system, releaseYear} = req.body;
     //Build the query based on how many parameters exist.
+    let paramCount = 1;
     let query = 
         "UPDATE games SET " + (
             title ?
-                "title=$1" + ((publisher || system || releaseYear) ?
+                "title=$" + paramCount++ + ((publisher || system || releaseYear) ?
                     "," : "")
                 : ""
         )
         + (
             publisher ?
-                "publisher=$2" + ((system || releaseYear) ?
+                "publisher=$" + paramCount++ + ((system || releaseYear) ?
                     "," : "")
                 : ""
         )
         + (
             system ?
-                "system=$3" + ((releaseYear) ?
+                "system=$" + paramCount++ + ((releaseYear) ?
                     "," : "")
                 : ""
         )
         + (
             releaseYear ?
-                "release_year=$4" : ""
-        ) + " WHERE id=$" + parseInt(!!title + !!publisher + !!system + !!releaseYear + 1);
+                "release_year=$" + paramCount++ : ""
+        ) + " WHERE id=$" + paramCount;
     //Build the arguments for the query based on the number of parameters.
     let args = [title ? title : false, publisher ? publisher : false, system ? system : false, releaseYear ? releaseYear : false, id].filter(Boolean);
     //Query is sent.
+    console.log("Query: " + query + "\nArgs: " + args);
     pool.query(query, args, (error) => {
         if (error) {
             throw error;
