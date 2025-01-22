@@ -1,6 +1,13 @@
 const express = require('express');
-const app = express()
+const cors = require('cors');
+const corsOption = {
+    credentials: true,
+    origin: ['http://localhost:4200', 'http://127.0.0.1:4200']
+}
+const app = express();
+
 app.use(express.json());
+app.use(cors(corsOption));
 const port = 3000;
 //All API routes exist in ./routes/games.js
 const api = require('./routes/games');
